@@ -9,6 +9,8 @@ void compress(string filename);
 void decompress(string filename);
 void showHelp();
 
+#define VERSION "1.0"
+
 const string FILEEXTENSION = "zpy";
 
 int main(int argc, char *argv[])
@@ -119,7 +121,7 @@ void decompress(string fn)
 
 void showHelp()
 {
-    printf("Snappy Test 1.0\n\n");
+    printf("Snappy Test %s\n\n", VERSION);
     printf("Usage: snappytest <options> <filename>\n\n");
     printf("Options:\n");
     printf("     -c  Compress a file\n");
