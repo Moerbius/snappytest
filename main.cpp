@@ -1,7 +1,17 @@
-#include <unistd.h>
+
+#ifdef _MSC_VER
+	#include "VC/getopt.h"
+	#include <tchar.h>
+#else
+	#include <unistd.h>
+#endif
+
 #include <fstream>
 #include <cstdlib>
 #include "snappy.h"
+
+#define VERSION "1.0.1"
+#define ARGUMENTS "hc:x:"
 
 using namespace std;
 
@@ -9,18 +19,30 @@ void compress(string filename);
 void decompress(string filename);
 void showHelp();
 
-#define VERSION "1.0"
-
 const string FILEEXTENSION = "zpy";
 
+#ifdef _MSC_VER
+int _tmain(int argc, TCHAR** argv)
+{
+	wchar_t *arguments = _T(ARGUMENTS);
+	wchar_t *filename;
+#else
 int main(int argc, char *argv[])
 {
+	char *arguments = ARGUMENTS;
+	char *filename = NULL;
+#endif
+
     int c;
+	bool comp = false;
+	bool decomp = false;
 
     if(argc == 1)
         showHelp();
 
-    while ((c = getopt(argc, argv, "hc:x:")) != -1)
+	c = getopt(argc, argv, arguments);
+
+    while (c != -1)
     {
         switch (c)
         {
@@ -28,10 +50,12 @@ int main(int argc, char *argv[])
             showHelp();
             break;
         case 'c':
-            compress(optarg);
+			filename = optarg;
+			comp = true;
             break;
         case 'x':
-            decompress(optarg);
+			filename = optarg;
+			decomp = true;
             break;
         case '?':
             if (optopt == ':')
@@ -39,17 +63,39 @@ int main(int argc, char *argv[])
             else if (isprint(optopt))
                 fprintf(stderr, "Unknown option `-%c'.\n", optopt);
             else
-                fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
+                fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
             exit(1);
         default:
             showHelp();
             break;
         }
-    }
 
+		c = getopt(argc, argv, arguments);
+    }
+	
+#ifdef _MSC_VER
+	char newfilename[255];
+	int i = 0;
+
+	while(filename[i] != '\0')
+	{
+	newfilename[i] = (char)filename[i];
+	++i;
+	}
+	newfilename[i] = '\0';
+#else
+	char *newfilename;
+	newfilename = filename;
+#endif
+	
+	if(comp)
+		compress(newfilename);
+	else if(decomp)
+		decompress(newfilename);
+		
     for (int index = optind; index < argc; index++)
         printf ("Non-option argument %s\n", argv[index]);
-
+		
     return 0;
 }
 
@@ -121,7 +167,7 @@ void decompress(string fn)
 
 void showHelp()
 {
-    printf("Snappy Test %s\n\n", VERSION);
+	printf("Snappy Test %d\n\n", VERSION);
     printf("Usage: snappytest <options> <filename>\n\n");
     printf("Options:\n");
     printf("     -c  Compress a file\n");
