@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include "snappy.h"
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 #define ARGUMENTS "hc:x:"
 
 using namespace std;
@@ -29,7 +29,7 @@ int _tmain(int argc, TCHAR** argv)
 #else
 int main(int argc, char *argv[])
 {
-	char *arguments = ARGUMENTS;
+	const char *arguments = ARGUMENTS;
 	char *filename = NULL;
 #endif
 
